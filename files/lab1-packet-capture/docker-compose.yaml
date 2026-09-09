@@ -1,0 +1,77 @@
+# Lab 1: Packet Capture & Traffic Analysis (Phase 1 — Reconnaissance)
+# Lab focus: tcpdump/tshark capture, Wireshark GUI analysis, Follow TCP Stream,
+#            reading cleartext credentials and scan traffic off the wire.
+
+services:
+
+  lab1-attacker:
+    image: ethical-base
+    container_name: lab1-attacker
+    hostname: kali-attacker
+    stdin_open: true
+    tty: true
+    user: root
+    networks:
+      lab1-net:
+        ipv4_address: 10.10.1.2
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - ./captures:/captures
+    command: >
+      /bin/bash -c "
+      echo '======================================================' &&
+      echo ' Lab 1 Attacker Ready' &&
+      echo ' Target: 10.10.1.10 (lab1-telnet, port 23)' &&
+      echo ' Wireshark GUI: http://localhost:14501' &&
+      echo ' Shared capture folder: /captures' &&
+      echo ' Enter: docker exec -it lab1-attacker bash' &&
+      echo '======================================================' &&
+      tail -f /dev/null"
+
+  lab1-telnet:
+    image: alpine:latest
+    container_name: lab1-telnet
+    hostname: legacy-router
+    networks:
+      lab1-net:
+        ipv4_address: 10.10.1.10
+    command: >
+      sh -c "
+      apk add --no-cache busybox-extras shadow &&
+      adduser -D -s /bin/sh netadmin &&
+      echo 'netadmin:cleartext123' | chpasswd &&
+      echo 'flag{lab1_telnet_sniffed_credentials}' > /home/netadmin/user.txt &&
+      chown netadmin:netadmin /home/netadmin/user.txt &&
+      echo 'flag{lab1_wireshark_stream_master}' > /root/root.txt &&
+      chmod 644 /root/root.txt && chmod 755 /root &&
+      /usr/sbin/telnetd -F"
+    restart: unless-stopped
+
+  lab1-wireshark:
+    image: lscr.io/linuxserver/wireshark:latest
+    container_name: lab1-wireshark
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    ports:
+      - "14501:3000"
+    volumes:
+      - ./captures:/captures
+    cap_add:
+      - NET_ADMIN
+    security_opt:
+      - seccomp:unconfined
+    networks:
+      lab1-net:
+        ipv4_address: 10.10.1.5
+    restart: unless-stopped
+
+networks:
+  lab1-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.1.0/24
