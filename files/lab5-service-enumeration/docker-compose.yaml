@@ -1,0 +1,100 @@
+# Lab 5: Directory Service & DB Enumeration (Phase 2 — Scanning & Enumeration)
+# Lab focus: LDAP, MySQL, SMB enumeration using enum4linux, ldapsearch, smbclient, mysql client
+
+services:
+
+  lab5-attacker:
+    image: ethical-base
+    container_name: lab5-attacker
+    hostname: kali-attacker
+    stdin_open: true
+    tty: true
+    user: root
+    networks:
+      lab5-net:
+        ipv4_address: 10.10.5.2
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: >
+      /bin/bash -c "
+      echo '======================================================' &&
+      echo ' Lab 5 Attacker Ready' &&
+      echo ' Targets on 10.10.5.0/24:' &&
+      echo '   10.10.5.10  lab5-ldap  (LDAP :389)' &&
+      echo '   10.10.5.11  lab5-mysql (MySQL :3306)' &&
+      echo '   10.10.5.12  lab5-smb   (SMB :445)' &&
+      echo ' Enter: docker exec -it lab5-attacker bash' &&
+      echo '======================================================' &&
+      tail -f /dev/null"
+
+  lab5-ldap:
+    image: osixia/openldap:1.5.0
+    container_name: lab5-ldap
+    hostname: ldap-server
+    environment:
+      - LDAP_ORGANISATION=CyberCorp
+      - LDAP_DOMAIN=cybercorp.local
+      - LDAP_ADMIN_PASSWORD=admin123
+      - LDAP_CONFIG_PASSWORD=config123
+      - LDAP_READONLY_USER=true
+      - LDAP_READONLY_USER_USERNAME=readonly
+      - LDAP_READONLY_USER_PASSWORD=readonly123
+      - LDAP_SEED_INTERNAL_LDIF_PATH=/ldifs
+    volumes:
+      - ./ldap-seed:/ldifs:ro
+    networks:
+      lab5-net:
+        ipv4_address: 10.10.5.10
+    restart: unless-stopped
+
+  lab5-mysql:
+    image: mysql:8.0
+    container_name: lab5-mysql
+    hostname: mysql-server
+    environment:
+      - MYSQL_ROOT_PASSWORD=toor
+      - MYSQL_DATABASE=corpdb
+      - MYSQL_USER=dbuser
+      - MYSQL_PASSWORD=dbpass123
+    networks:
+      lab5-net:
+        ipv4_address: 10.10.5.11
+    volumes:
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+    restart: unless-stopped
+
+  lab5-smb:
+    image: ubuntu:22.04
+    container_name: lab5-smb
+    hostname: smb-server
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    networks:
+      lab5-net:
+        ipv4_address: 10.10.5.12
+    command: >
+      /bin/bash -c "
+      apt-get update -qq &&
+      apt-get install -y -q samba &&
+      useradd -m -s /bin/bash alice &&
+      echo 'alice:alice123' | chpasswd &&
+      (echo alice123; echo alice123) | smbpasswd -a -s alice &&
+      useradd -m -s /bin/bash bob &&
+      echo 'bob:bob456' | chpasswd &&
+      (echo bob456; echo bob456) | smbpasswd -a -s bob &&
+      mkdir -p /srv/samba/public /srv/samba/private &&
+      echo 'CyberCorp public share.' > /srv/samba/public/notice.txt &&
+      echo 'flag{lab5_smb_guest_accessed}' > /srv/samba/public/user.txt &&
+      echo 'Internal documents - confidential.' > /srv/samba/private/readme.txt &&
+      echo 'flag{lab5_smb_valid_creds_private_share}' > /srv/samba/private/root.txt &&
+      printf '[global]\n  workgroup = CYBERCORP\n  server string = CyberCorp File Server\n  netbios name = SMB-SERVER\n  security = user\n  map to guest = bad user\n  dns proxy = no\n\n[public]\n  path = /srv/samba/public\n  browsable = yes\n  guest ok = yes\n  read only = yes\n\n[private]\n  path = /srv/samba/private\n  browsable = no\n  guest ok = no\n  valid users = alice\n  read only = yes\n' > /etc/samba/smb.conf &&
+      smbd --foreground --no-process-group"
+    restart: unless-stopped
+
+networks:
+  lab5-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.5.0/24

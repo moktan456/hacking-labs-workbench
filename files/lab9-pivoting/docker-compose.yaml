@@ -1,0 +1,119 @@
+# Lab 9: Lateral Movement & Pivoting (Phase 4 — Maintaining Access)
+#
+# Network topology:
+#   EXTERNAL (10.10.9.0/24)  — attacker lives here, can reach the pivot host only
+#   INTERNAL (10.10.90.0/24) — internal targets, only reachable via the pivot host
+#
+#   lab9-attacker  (10.10.9.2)  — external only
+#   lab9-pivot     (10.10.9.10 + 10.10.90.10) — both networks (the hop)
+#   lab9-internal-web  (10.10.90.20) — internal only
+#   lab9-internal-db   (10.10.90.21) — internal only
+
+services:
+
+  lab9-attacker:
+    image: metasploitframework/metasploit-framework:latest
+    container_name: lab9-attacker
+    hostname: kali-attacker
+    stdin_open: true
+    tty: true
+    # This image's own entrypoint drops privileges to a non-root 'msf' user
+    # before running anything, which blocks apk from installing the extra
+    # tools this lab needs (ssh client, proxychains, mysql client, ss). Bypass
+    # it so the container starts as root and can install them at boot.
+    entrypoint: []
+    networks:
+      lab9-external:
+        ipv4_address: 10.10.9.2
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: >
+      /bin/bash -c "
+      apk update -q &&
+      apk add --no-cache openssh-client proxychains-ng mariadb-client iproute2 sshpass >/dev/null 2>&1 &&
+      sed -i 's/^socks4.*9050/socks5  127.0.0.1 1080/' /etc/proxychains/proxychains.conf &&
+      echo '======================================================' &&
+      echo ' Lab 9 Attacker Ready (Metasploit included)' &&
+      echo ' Your IP: 10.10.9.2 (external network only)' &&
+      echo ' Pivot:   10.10.9.10 (ssh user: pivotuser / pivot123)' &&
+      echo ' Internal targets (reachable ONLY via the pivot):' &&
+      echo '   10.10.90.20  lab9-internal-web  (HTTP :80)' &&
+      echo '   10.10.90.21  lab9-internal-db   (MySQL :3306)' &&
+      echo ' Enter: docker exec -it lab9-attacker bash' &&
+      echo '======================================================' &&
+      tail -f /dev/null"
+
+  lab9-pivot:
+    image: ubuntu:22.04
+    container_name: lab9-pivot
+    hostname: pivot-host
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    networks:
+      lab9-external:
+        ipv4_address: 10.10.9.10
+      lab9-internal:
+        ipv4_address: 10.10.90.10
+    command: >
+      /bin/bash -c "
+      apt-get update -qq &&
+      apt-get install -y -q openssh-server iproute2 iptables net-tools &&
+      mkdir -p /var/run/sshd &&
+      ssh-keygen -A &&
+      useradd -m -s /bin/bash pivotuser &&
+      echo 'pivotuser:pivot123' | chpasswd &&
+      echo 'flag{lab9_pivot_host_accessed}' > /home/pivotuser/user.txt &&
+      chown pivotuser:pivotuser /home/pivotuser/user.txt &&
+      sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      echo 'AllowTcpForwarding yes' >> /etc/ssh/sshd_config &&
+      echo 'PermitTunnel yes' >> /etc/ssh/sshd_config &&
+      echo 'GatewayPorts yes' >> /etc/ssh/sshd_config &&
+      echo 'Pivot host ready. Internal network: 10.10.90.0/24' &&
+      /usr/sbin/sshd -D"
+    restart: unless-stopped
+
+  lab9-internal-web:
+    image: nginx:alpine
+    container_name: lab9-internal-web
+    hostname: internal-web
+    networks:
+      lab9-internal:
+        ipv4_address: 10.10.90.20
+    volumes:
+      - ./internal-web:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+  lab9-internal-db:
+    # MariaDB, not mysql:8.0 - the Alpine-based attacker's mariadb-client is
+    # missing the caching_sha2_password plugin that MySQL 8.0 defaults to,
+    # and MariaDB avoids the whole problem by using mysql_native_password.
+    image: mariadb:10.11
+    container_name: lab9-internal-db
+    hostname: internal-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=internalR00t
+      - MYSQL_DATABASE=internaldb
+      - MYSQL_USER=appuser
+      - MYSQL_PASSWORD=apppass456
+    volumes:
+      - ./mysql-init:/docker-entrypoint-initdb.d:ro
+    networks:
+      lab9-internal:
+        ipv4_address: 10.10.90.21
+    restart: unless-stopped
+
+networks:
+  lab9-external:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.9.0/24
+
+  lab9-internal:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 10.10.90.0/24

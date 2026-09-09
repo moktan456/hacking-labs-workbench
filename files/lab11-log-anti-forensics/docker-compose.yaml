@@ -1,0 +1,71 @@
+# Lab 11: Log Manipulation & Anti-Forensics (Phase 5 — Covering Tracks)
+# Lab focus: bash history control, log editing (auth.log/wtmp), timestomping, secure deletion
+# Scenario: you already have root (given). Generate some noisy activity, then erase the
+# evidence and prove it with the included verification script.
+
+services:
+
+  lab11-attacker:
+    image: ethical-base
+    container_name: lab11-attacker
+    hostname: kali-attacker
+    stdin_open: true
+    tty: true
+    user: root
+    networks:
+      lab11-net:
+        ipv4_address: 10.10.11.2
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: >
+      /bin/bash -c "
+      echo '======================================================' &&
+      echo ' Lab 11 Attacker Ready' &&
+      echo ' Target: 10.10.11.10  lab11-target (SSH :22)' &&
+      echo ' Credentials: root / toor123' &&
+      echo ' Enter: docker exec -it lab11-attacker bash' &&
+      echo '======================================================' &&
+      tail -f /dev/null"
+
+  lab11-target:
+    image: ubuntu:22.04
+    container_name: lab11-target
+    hostname: target-host
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    networks:
+      lab11-net:
+        ipv4_address: 10.10.11.10
+    volumes:
+      - ./target-files/verify.sh:/root/verify.sh:ro
+    command: >
+      /bin/bash -c "
+      apt-get update -qq &&
+      apt-get install -y -q openssh-server rsyslog &&
+      mkdir -p /var/run/sshd &&
+      ssh-keygen -A &&
+      echo 'root:toor123' | chpasswd &&
+      sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config &&
+      sed -i 's/PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config &&
+      sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      echo 'session    optional     pam_lastlog.so' >> /etc/pam.d/sshd &&
+      touch /var/log/wtmp && chmod 664 /var/log/wtmp &&
+      echo 'flag{lab11_root_access_given}' > /root/user.txt &&
+      echo 'flag{lab11_full_control_granted}' > /root/root.txt &&
+      echo '#!/bin/bash' > /root/dropped_tool.sh &&
+      echo 'echo pretend malicious payload' >> /root/dropped_tool.sh &&
+      chmod +x /root/dropped_tool.sh &&
+      echo 'This file has looked untouched since last year.' > /root/legit_reference.txt &&
+      touch -d '2023-01-15 09:00:00' /root/legit_reference.txt &&
+      rsyslogd &&
+      /usr/sbin/sshd -D"
+    restart: unless-stopped
+
+networks:
+  lab11-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.11.0/24

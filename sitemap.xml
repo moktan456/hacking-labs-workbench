@@ -10,7 +10,46 @@
     <loc>https://moktan456.github.io/hacking-labs-workbench/LICENSE.html</loc>
   </url>
   <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/aio.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/buffer-overflow-exploitation.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/capstone-full-chain-ctf.html</loc>
+  </url>
+  <url>
     <loc>https://moktan456.github.io/hacking-labs-workbench/citation.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/files/lab12-full-chain-ctf/web-content/index.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/files/lab2-osint-recon/web-content/index.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/files/lab3-nmap-scanning/web-content/index.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/files/lab4-web-enumeration/web-content/admin/index.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/files/lab4-web-enumeration/web-content/backup/index.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/files/lab4-web-enumeration/web-content/index.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/files/lab4-web-enumeration/web-content/uploads/index.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/files/lab8-buffer-overflow/recon-web/index.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/files/lab9-pivoting/internal-web/index.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/images.html</loc>
   </url>
   <url>
     <loc>https://moktan456.github.io/hacking-labs-workbench/index.html</loc>
@@ -25,13 +64,82 @@
     <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/LICENSE.html</loc>
   </url>
   <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/aio.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/buffer-overflow-exploitation.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/capstone-full-chain-ctf.html</loc>
+  </url>
+  <url>
     <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/citation.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/images.html</loc>
   </url>
   <url>
     <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/index.html</loc>
   </url>
   <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/instructor-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/key-points.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/lab10-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/lab11-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/lab12-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/lab2-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/lab3-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/lab4-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/lab5-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/lab6-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/lab7-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/lab8-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/lab9-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/log-anti-forensics.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/nmap-port-scanning.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/osint-active-recon.html</loc>
+  </url>
+  <url>
     <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/packet-capture-traffic-analysis.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/password-attacks.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/persistence.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/pivoting.html</loc>
   </url>
   <url>
     <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/profiles.html</loc>
@@ -40,12 +148,87 @@
     <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/reference.html</loc>
   </url>
   <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/service-enumeration.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/web-enumeration.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor/web-exploitation.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/instructor-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/key-points.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/lab10-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/lab11-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/lab12-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/lab2-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/lab3-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/lab4-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/lab5-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/lab6-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/lab7-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/lab8-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/lab9-notes.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/log-anti-forensics.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/nmap-port-scanning.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/osint-active-recon.html</loc>
+  </url>
+  <url>
     <loc>https://moktan456.github.io/hacking-labs-workbench/packet-capture-traffic-analysis.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/password-attacks.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/persistence.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/pivoting.html</loc>
   </url>
   <url>
     <loc>https://moktan456.github.io/hacking-labs-workbench/profiles.html</loc>
   </url>
   <url>
     <loc>https://moktan456.github.io/hacking-labs-workbench/reference.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/service-enumeration.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/web-enumeration.html</loc>
+  </url>
+  <url>
+    <loc>https://moktan456.github.io/hacking-labs-workbench/web-exploitation.html</loc>
   </url>
 </urlset>
