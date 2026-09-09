@@ -328,7 +328,7 @@ No hints below — ask your instructor if you get stuck.
 The full CTF walkthrough for this lab (including both flag values and the
 exact end-to-end attack chain) is provided separately to instructors, so
 it stays out of a learner's browser history/search results. See
-[Lab 12 Notes](../instructors/lab12-notes.html).
+[Lab 12 Notes](lab12-notes.html).
 
 :::::::::::::::::::::::::::::::::
 ::::::::::::::::::::::::::::::::::::::::::::::::

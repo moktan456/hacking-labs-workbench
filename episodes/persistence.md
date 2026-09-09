@@ -414,7 +414,7 @@ No hints below — ask your instructor if you get stuck.
 The full CTF walkthrough for this lab (including both flag values and the
 exact steps) is provided separately to instructors rather than inline here,
 so it stays out of a learner's browser history/search results. See the
-[instructor notes](../instructors/lab10-notes.html).
+[instructor notes](lab10-notes.html).
 
 :::::::::::::::::::::::::::::::::
 ::::::::::::::::::::::::::::::::::::::::::::::::
