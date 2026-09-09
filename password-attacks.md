@@ -338,7 +338,7 @@ your instructor if you get stuck.
 The full CTF walkthrough for this lab (including all flag values and the
 exact steps) is provided separately to instructors rather than inline
 here, so it stays out of a learner's browser history/search results. See
-[Lab 6 Notes](../instructors/lab6-notes.html).
+[Lab 6 Notes](lab6-notes.html).
 
 :::::::::::::::::::::::::::::::::
 ::::::::::::::::::::::::::::::::::::::::::::::::
