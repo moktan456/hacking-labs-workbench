@@ -1,0 +1,103 @@
+# Lab 12: Full-Chain Capstone CTF (Phases 1-5, chained)
+# Recon (nmap) -> enumeration (ftp/web) -> gaining access (decrypt creds, ssh) ->
+# maintaining access / privesc (sudo misconfig) -> optional covering-tracks bonus
+
+services:
+
+  lab12-attacker:
+    image: ethical-base
+    container_name: lab12-attacker
+    hostname: kali-attacker
+    stdin_open: true
+    tty: true
+    user: root
+    networks:
+      lab12-net:
+        ipv4_address: 10.10.12.2
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: >
+      /bin/bash -c "
+      echo '======================================================' &&
+      echo ' Lab 12 Capstone Attacker Ready' &&
+      echo ' Full chain: recon -> enum -> gain access -> privesc' &&
+      echo ' Targets on 10.10.12.0/24 - go find them yourself.' &&
+      echo ' Enter: docker exec -it lab12-attacker bash' &&
+      echo '======================================================' &&
+      tail -f /dev/null"
+
+  lab12-web:
+    image: nginx:alpine
+    container_name: lab12-web
+    hostname: web-server
+    networks:
+      lab12-net:
+        ipv4_address: 10.10.12.10
+    volumes:
+      - ./web-content:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+  lab12-ftp:
+    image: ubuntu:22.04
+    container_name: lab12-ftp
+    hostname: ftp-server
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    networks:
+      lab12-net:
+        ipv4_address: 10.10.12.11
+    command: >
+      /bin/bash -c "
+      apt-get update -qq &&
+      apt-get install -y -q vsftpd openssl &&
+      mkdir -p /var/ftp/pub /var/run/vsftpd/empty &&
+      echo 'CyberCorp IT Onboarding Archive' > /var/ftp/pub/README.txt &&
+      printf 'New Hire Directory (Q1 2024)\njdoe - IT Support\nasmith - Finance\nmpatel - Engineering\n' > /var/ftp/pub/employees.txt &&
+      echo 'jdoe SSH password: N3wHire2024#' > /tmp/backup-plain.txt &&
+      openssl enc -aes-256-cbc -salt -pbkdf2 -in /tmp/backup-plain.txt -out /var/ftp/pub/backup.enc -pass pass:Summer2024! &&
+      rm -f /tmp/backup-plain.txt &&
+      echo 'anonymous_enable=YES' > /etc/vsftpd.conf &&
+      echo 'local_enable=NO' >> /etc/vsftpd.conf &&
+      echo 'write_enable=NO' >> /etc/vsftpd.conf &&
+      echo 'listen=YES' >> /etc/vsftpd.conf &&
+      echo 'listen_ipv6=NO' >> /etc/vsftpd.conf &&
+      echo 'anon_root=/var/ftp' >> /etc/vsftpd.conf &&
+      echo 'secure_chroot_dir=/var/run/vsftpd/empty' >> /etc/vsftpd.conf &&
+      echo 'seccomp_sandbox=NO' >> /etc/vsftpd.conf &&
+      echo 'ftpd_banner=CyberCorp FTP Archive Server' >> /etc/vsftpd.conf &&
+      vsftpd /etc/vsftpd.conf"
+    restart: unless-stopped
+
+  lab12-ssh:
+    image: ubuntu:22.04
+    container_name: lab12-ssh
+    hostname: ssh-server
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    networks:
+      lab12-net:
+        ipv4_address: 10.10.12.12
+    command: >
+      /bin/bash -c "
+      apt-get update -qq &&
+      apt-get install -y -q openssh-server findutils sudo &&
+      mkdir -p /var/run/sshd &&
+      ssh-keygen -A &&
+      useradd -m -s /bin/bash jdoe &&
+      echo 'jdoe:N3wHire2024#' | chpasswd &&
+      echo 'flag{lab12_ftp_to_ssh_creds_chain}' > /home/jdoe/user.txt &&
+      chown jdoe:jdoe /home/jdoe/user.txt &&
+      echo 'flag{lab12_full_chain_root}' > /root/root.txt &&
+      echo 'jdoe ALL=(ALL) NOPASSWD: /usr/bin/find' >> /etc/sudoers &&
+      sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      /usr/sbin/sshd -D"
+    restart: unless-stopped
+
+networks:
+  lab12-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.12.0/24

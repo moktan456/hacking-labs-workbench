@@ -1,0 +1,68 @@
+# Lab 10: Persistence & Backdoors (Phase 4 — Maintaining Access)
+# Lab focus: SSH key persistence, cron backdoors, netcat/socat reverse & bind shells
+# Scenario: you already have a low-priv foothold (given). Plant a way back in that
+# survives the target's credentials being rotated.
+
+services:
+
+  lab10-attacker:
+    image: ethical-base
+    container_name: lab10-attacker
+    hostname: kali-attacker
+    stdin_open: true
+    tty: true
+    user: root
+    networks:
+      lab10-net:
+        ipv4_address: 10.10.10.2
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: >
+      /bin/bash -c "
+      echo '======================================================' &&
+      echo ' Lab 10 Attacker Ready' &&
+      echo ' Target: 10.10.10.10  lab10-target (SSH :22)' &&
+      echo ' Foothold creds: lowpriv / lowpriv123' &&
+      echo ' Enter: docker exec -it lab10-attacker bash' &&
+      echo '======================================================' &&
+      tail -f /dev/null"
+
+  lab10-target:
+    image: ubuntu:22.04
+    container_name: lab10-target
+    hostname: target-host
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    networks:
+      lab10-net:
+        ipv4_address: 10.10.10.10
+    cap_add:
+      - SYS_PTRACE
+    command: >
+      /bin/bash -c "
+      apt-get update -qq &&
+      apt-get install -y -q openssh-server cron netcat-traditional socat &&
+      mkdir -p /var/run/sshd &&
+      ssh-keygen -A &&
+      useradd -m -s /bin/bash lowpriv &&
+      echo 'lowpriv:lowpriv123' | chpasswd &&
+      mkdir -p /home/lowpriv/.ssh && chmod 700 /home/lowpriv/.ssh &&
+      touch /home/lowpriv/.ssh/authorized_keys && chmod 600 /home/lowpriv/.ssh/authorized_keys &&
+      chown -R lowpriv:lowpriv /home/lowpriv/.ssh &&
+      echo 'flag{lab10_initial_foothold}' > /home/lowpriv/user.txt &&
+      echo 'flag{lab10_persistence_survived_rotation}' > /home/lowpriv/root.txt &&
+      chown lowpriv:lowpriv /home/lowpriv/user.txt /home/lowpriv/root.txt &&
+      chmod 640 /home/lowpriv/root.txt &&
+      sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      service cron start &&
+      /usr/sbin/sshd -D"
+    restart: unless-stopped
+
+networks:
+  lab10-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.10.0/24

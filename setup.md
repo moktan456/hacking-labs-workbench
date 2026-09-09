@@ -71,24 +71,39 @@ docker build -t ethical-base -f episodes/files/base.Dockerfile .
 
 ## Start a lab
 
-Each episode names its own lab directory under `episodes/files/`. For the
-**Packet Capture & Traffic Analysis** episode:
+Each episode names its own lab directory under `episodes/files/`. General
+pattern:
 
 ```bash
-cd episodes/files/lab1-packet-capture
+cd episodes/files/<lab-directory>
 docker compose up -d
-docker exec -it lab1-attacker bash
-```
-
-Captures are saved to `./captures` on your host, which is also mounted into
-the lab's Wireshark container — anything you save from the attacker
-container is instantly openable in the GUI.
-
-When you're done:
-
-```bash
+docker exec -it <attacker-container-name> bash
+# ... work through the episode ...
 docker compose down
 ```
+
+The exact attacker container name, target IPs, and any extra steps (e.g.
+Lab 1's Wireshark GUI at `http://localhost:14501`) are given at the top of
+each episode.
+
+| Episode | Lab directory |
+|---|---|
+| Packet Capture & Traffic Analysis | `lab1-packet-capture` |
+| OSINT & Active Host Discovery | `lab2-osint-recon` |
+| Nmap Port & Service Scanning | `lab3-nmap-scanning` |
+| Web Enumeration | `lab4-web-enumeration` |
+| Directory Service & DB Enumeration | `lab5-service-enumeration` |
+| Password Attacks | `lab6-password-attacks` |
+| Web Application Exploitation | `lab7-web-exploitation` |
+| Exploit Development (Buffer Overflow) | `lab8-buffer-overflow` |
+| Lateral Movement & Pivoting | `lab9-pivoting` |
+| Persistence & Backdoors | `lab10-persistence` |
+| Log Manipulation & Anti-Forensics | `lab11-log-anti-forensics` |
+| Full-Chain Capstone CTF | `lab12-full-chain-ctf` |
+
+Only one lab's containers need to run at a time — run `docker compose down`
+in a lab's directory before starting the next one to avoid Docker network/IP
+conflicts between labs.
 
 ## Data Sets
 

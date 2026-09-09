@@ -1,0 +1,77 @@
+# Lab 6: Password Attacks (Phase 3 — Gaining Access)
+# Lab focus: offline hash cracking (john, hashcat) and online service brute-forcing (hydra, medusa)
+
+services:
+
+  lab6-attacker:
+    image: ethical-base
+    container_name: lab6-attacker
+    hostname: hacklab
+    stdin_open: true
+    tty: true
+    user: root
+    networks:
+      lab6-net:
+        ipv4_address: 10.10.6.2
+    volumes:
+      - ./wordlists:/wordlists
+      - ./hashes:/hashes
+    command: >
+      /bin/bash -c "
+      echo '======================================================' &&
+      echo ' Lab 6 Attacker Ready' &&
+      echo ' Targets on 10.10.6.0/24:' &&
+      echo '   10.10.6.10  lab6-ssh  (SSH :22)' &&
+      echo '   10.10.6.11  lab6-web  (HTTP :80, login form)' &&
+      echo ' Wordlist:   /wordlists/basic.txt' &&
+      echo ' Hashes:     /hashes/' &&
+      echo ' Enter: docker exec -it lab6-attacker bash' &&
+      echo '======================================================' &&
+      tail -f /dev/null"
+    cap_add:
+      - NET_ADMIN
+
+  lab6-ssh:
+    image: ubuntu:22.04
+    container_name: lab6-ssh
+    hostname: target-server
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    networks:
+      lab6-net:
+        ipv4_address: 10.10.6.10
+    command: >
+      /bin/bash -c "
+      apt-get update -qq &&
+      apt-get install -y -q openssh-server &&
+      mkdir -p /var/run/sshd &&
+      ssh-keygen -A &&
+      useradd -m admin && echo 'admin:letmein' | chpasswd &&
+      useradd -m user1 && echo 'user1:qwerty' | chpasswd &&
+      echo 'flag{lab6_password_cracked_ssh}' > /home/admin/user.txt &&
+      chown admin:admin /home/admin/user.txt &&
+      echo 'flag{lab6_rockyou_wordlist_win}' > /home/user1/root.txt &&
+      chown user1:user1 /home/user1/root.txt &&
+      sed -i 's/#PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      echo 'SSH Target Server Ready' &&
+      /usr/sbin/sshd -D"
+    restart: unless-stopped
+
+  lab6-web:
+    image: python:3.12-alpine
+    container_name: lab6-web
+    hostname: web-server
+    networks:
+      lab6-net:
+        ipv4_address: 10.10.6.11
+    volumes:
+      - ./web-target:/app:ro
+    command: python3 /app/login_server.py
+    restart: unless-stopped
+
+networks:
+  lab6-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.6.0/24

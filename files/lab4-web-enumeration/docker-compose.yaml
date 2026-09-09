@@ -1,0 +1,45 @@
+# Lab 4: Web Enumeration (Phase 2 — Scanning & Enumeration)
+# Lab focus: directory/file brute-forcing with gobuster, dirb, ffuf; nikto scanning
+
+services:
+
+  lab4-attacker:
+    image: ethical-base
+    container_name: lab4-attacker
+    hostname: kali-attacker
+    stdin_open: true
+    tty: true
+    user: root
+    networks:
+      lab4-net:
+        ipv4_address: 10.10.4.2
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: >
+      /bin/bash -c "
+      echo '======================================================' &&
+      echo ' Lab 4 Attacker Ready' &&
+      echo ' Target: 10.10.4.10  lab4-web (HTTP :80)' &&
+      echo ' Wordlist: /usr/share/dirb/wordlists/common.txt' &&
+      echo ' Enter: docker exec -it lab4-attacker bash' &&
+      echo '======================================================' &&
+      tail -f /dev/null"
+
+  lab4-web:
+    image: nginx:alpine
+    container_name: lab4-web
+    hostname: web-server
+    networks:
+      lab4-net:
+        ipv4_address: 10.10.4.10
+    volumes:
+      - ./web-content:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+networks:
+  lab4-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.4.0/24

@@ -1,0 +1,5 @@
+CyberCorp config backup - DO NOT COMMIT
+admin_portal=admin-portal.cybercorp.lab
+note=default creds rotated after Q1 audit, this file should have been deleted
+
+flag{lab2_html_comment_led_to_backup}
