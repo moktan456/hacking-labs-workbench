@@ -1,0 +1,23 @@
+# This template CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to replace its contents
+# with information about your lesson.
+# Remember to update this file periodically,
+# ensuring that the author list and other fields remain accurate.
+
+cff-version: 1.2.0
+title: "Ethical Hacking Labs: Docker-Based Practical Training"
+message: >-
+  Please cite this lesson using the information in this file
+  when you refer to it in publications, and/or if you
+  re-use, adapt, or expand on the content in your own
+  training material.
+type: dataset
+authors:
+  - name: "Hacking-Labs-Training contributors"
+abstract: >-
+  A hands-on ethical hacking curriculum built on The Carpentries
+  Workbench, teaching packet capture and traffic analysis, scanning
+  and enumeration, exploitation, and post-exploitation techniques
+  using isolated Docker Compose lab environments. Ported from the
+  companion Hacking-Labs-Training repository as a pilot episode.
+license: CC-BY-4.0
