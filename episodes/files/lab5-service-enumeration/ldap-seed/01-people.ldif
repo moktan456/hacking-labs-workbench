@@ -1,0 +1,30 @@
+dn: ou=people,dc=cybercorp,dc=local
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=cybercorp,dc=local
+objectClass: organizationalUnit
+ou: groups
+
+dn: cn=jsmith,ou=people,dc=cybercorp,dc=local
+objectClass: inetOrgPerson
+cn: jsmith
+sn: Smith
+givenName: John
+uid: jsmith
+mail: jsmith@cybercorp.local
+title: Network Administrator
+
+dn: cn=mrodriguez,ou=people,dc=cybercorp,dc=local
+objectClass: inetOrgPerson
+cn: mrodriguez
+sn: Rodriguez
+givenName: Maria
+uid: mrodriguez
+mail: mrodriguez@cybercorp.local
+title: Database Administrator
+
+dn: cn=itadmins,ou=groups,dc=cybercorp,dc=local
+objectClass: groupOfNames
+cn: itadmins
+member: cn=jsmith,ou=people,dc=cybercorp,dc=local

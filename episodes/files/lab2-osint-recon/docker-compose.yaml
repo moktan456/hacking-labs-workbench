@@ -1,0 +1,99 @@
+# Lab 2: OSINT & Active Host Discovery (Phase 1 — Reconnaissance)
+# Lab focus: whois/dig against real, safe, reserved-for-documentation domains;
+#            local DNS zone enumeration (AXFR misconfig); ping sweep / list scan;
+#            banner grabbing over raw sockets and HTTP.
+
+services:
+
+  lab2-attacker:
+    image: ethical-base
+    container_name: lab2-attacker
+    hostname: kali-attacker
+    stdin_open: true
+    tty: true
+    user: root
+    networks:
+      lab2-net:
+        ipv4_address: 10.10.2.2
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    command: >
+      /bin/bash -c "
+      echo '======================================================' &&
+      echo ' Lab 2 Attacker Ready' &&
+      echo ' Internal DNS:   10.10.2.5   (zone: cybercorp.lab)' &&
+      echo ' Web target:     10.10.2.10  (HTTP :80)' &&
+      echo ' Legacy target:  10.10.2.11  (FTP :21, SSH :22)' &&
+      echo ' Enter: docker exec -it lab2-attacker bash' &&
+      echo '======================================================' &&
+      tail -f /dev/null"
+
+  lab2-dns:
+    image: ubuntu:22.04
+    container_name: lab2-dns
+    hostname: ns
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    networks:
+      lab2-net:
+        ipv4_address: 10.10.2.5
+    command: >
+      /bin/bash -c "
+      apt-get update -qq && apt-get install -y -q bind9 &&
+      mkdir -p /etc/bind &&
+      printf 'zone \"cybercorp.lab\" {\n  type master;\n  file \"/etc/bind/db.cybercorp.lab\";\n  allow-transfer { any; };\n};\n' > /etc/bind/named.conf.local &&
+      printf 'options {\n  directory \"/var/cache/bind\";\n  recursion no;\n  dnssec-validation no;\n  listen-on { any; };\n  allow-query { any; };\n};\n' > /etc/bind/named.conf.options &&
+      printf '@ IN SOA ns.cybercorp.lab. admin.cybercorp.lab. ( 3 604800 86400 2419200 604800 )\n@            IN NS  ns.cybercorp.lab.\nns           IN A   10.10.2.5\nwww          IN A   10.10.2.10\nmail         IN A   10.10.2.11\nvpn          IN A   10.10.2.13\nadmin-portal IN A   10.10.2.14\n_flag        IN TXT \"flag{lab2_axfr_zone_leak}\"\n' > /etc/bind/db.cybercorp.lab &&
+      named-checkzone cybercorp.lab /etc/bind/db.cybercorp.lab &&
+      named -g -u bind"
+    restart: unless-stopped
+
+  lab2-web:
+    image: nginx:alpine
+    container_name: lab2-web
+    hostname: www
+    networks:
+      lab2-net:
+        ipv4_address: 10.10.2.10
+    volumes:
+      - ./web-content:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+  lab2-legacy:
+    image: ubuntu:22.04
+    container_name: lab2-legacy
+    hostname: legacy-server
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    networks:
+      lab2-net:
+        ipv4_address: 10.10.2.11
+    command: >
+      /bin/bash -c "
+      apt-get update -qq &&
+      apt-get install -y -q vsftpd openssh-server &&
+      mkdir -p /var/ftp/pub /var/run/sshd /var/run/vsftpd/empty &&
+      echo 'CyberCorp Legacy File Server - est. 2009' > /var/ftp/pub/README.txt &&
+      echo 'anonymous_enable=YES' > /etc/vsftpd.conf &&
+      echo 'local_enable=NO' >> /etc/vsftpd.conf &&
+      echo 'write_enable=NO' >> /etc/vsftpd.conf &&
+      echo 'listen=YES' >> /etc/vsftpd.conf &&
+      echo 'listen_ipv6=NO' >> /etc/vsftpd.conf &&
+      echo 'anon_root=/var/ftp' >> /etc/vsftpd.conf &&
+      echo 'secure_chroot_dir=/var/run/vsftpd/empty' >> /etc/vsftpd.conf &&
+      echo 'seccomp_sandbox=NO' >> /etc/vsftpd.conf &&
+      echo 'ftpd_banner=CyberCorp FTP Server (vsftpd 2.3.4) ready.' >> /etc/vsftpd.conf &&
+      ssh-keygen -A &&
+      printf 'CyberCorp Legacy SSH Gateway - OpenSSH 8.2 - Authorised access only\n' > /etc/ssh/banner &&
+      echo 'Banner /etc/ssh/banner' >> /etc/ssh/sshd_config &&
+      (vsftpd /etc/vsftpd.conf &) &&
+      /usr/sbin/sshd -D"
+    restart: unless-stopped
+
+networks:
+  lab2-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.2.0/24

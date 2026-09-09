@@ -1,0 +1,91 @@
+# Lab 8: Exploit Development (Buffer Overflow) (Phase 3 — Gaining Access)
+# Lab focus: stack buffer overflow analysis, GDB debugging, ret2win technique with pwntools
+
+services:
+
+  lab8-attacker:
+    image: ethical-base
+    container_name: lab8-attacker
+    hostname: kali-attacker
+    stdin_open: true
+    tty: true
+    user: root
+    networks:
+      lab8-net:
+        ipv4_address: 10.10.8.2
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - ./target-files:/root/tools
+    command: >
+      /bin/bash -c "
+      chmod +x /root/tools/vuln &&
+      echo '======================================================' &&
+      echo ' Lab 8 Attacker Ready' &&
+      echo ' Tools: gdb, pwntools, gcc (all pre-installed)' &&
+      echo ' Local copy of the binary: /root/tools/vuln' &&
+      echo ' (pre-built - identical to the one the target runs)' &&
+      echo ' Exploit template: /root/tools/exploit_template.py' &&
+      echo ' Targets:' &&
+      echo '   10.10.8.10  lab8-recon      (HTTP :80)' &&
+      echo '   10.10.8.11  lab8-vuln-target (vuln service :9999, SSH :22)' &&
+      echo ' Enter: docker exec -it lab8-attacker bash' &&
+      echo '======================================================' &&
+      tail -f /dev/null"
+
+  lab8-recon:
+    image: nginx:alpine
+    container_name: lab8-recon
+    hostname: recon-web
+    networks:
+      lab8-net:
+        ipv4_address: 10.10.8.10
+    volumes:
+      - ./recon-web:/usr/share/nginx/html:ro
+    restart: unless-stopped
+
+  lab8-vuln-target:
+    image: ubuntu:22.04
+    container_name: lab8-vuln-target
+    hostname: vuln-target
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    networks:
+      lab8-net:
+        ipv4_address: 10.10.8.11
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - ./target-files:/opt/target:ro
+    command: >
+      /bin/bash -c "
+      apt-get update -qq &&
+      apt-get install -y -q socat openssh-server &&
+      mkdir -p /var/run/sshd &&
+      ssh-keygen -A &&
+      useradd -m -s /bin/bash lowpriv &&
+      echo 'lowpriv:lowpriv123' | chpasswd &&
+      echo 'flag{lab8_ssh_initial_access}' > /home/lowpriv/user.txt &&
+      chown lowpriv:lowpriv /home/lowpriv/user.txt &&
+      sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config &&
+      /usr/sbin/sshd &&
+      cp /opt/target/vuln /opt/vuln && chmod +x /opt/vuln &&
+      cp /opt/vuln /home/lowpriv/vuln &&
+      chown lowpriv:lowpriv /home/lowpriv/vuln &&
+      echo 'Vulnerable service (pre-built binary) listening on :9999' &&
+      socat TCP-LISTEN:9999,reuseaddr,fork EXEC:/opt/vuln"
+    restart: unless-stopped
+
+networks:
+  lab8-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 10.10.8.0/24

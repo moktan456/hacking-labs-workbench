@@ -16,7 +16,7 @@ title: 'Ethical Hacking Labs: Docker-Based Practical Training'
 created: 2026-09-09
 
 # Comma-separated list of keywords for the lesson
-keywords: 'ethical hacking, penetration testing, cybersecurity, docker, packet capture, wireshark, tcpdump, nmap'
+keywords: 'ethical hacking, penetration testing, cybersecurity, docker, packet capture, wireshark, tcpdump, nmap, OSINT, enumeration, password attacks, web exploitation, buffer overflow, pivoting, persistence, anti-forensics, CTF'
 
 # Life cycle stage of the lesson
 # refer to <https://docs.carpentries.org/resources/curriculum/lesson-life-cycle.html> for details
@@ -44,12 +44,35 @@ contact: 'moktannima2015@gmail.com'
 # Order of episodes in your lesson
 episodes:
 - packet-capture-traffic-analysis.md
+- osint-active-recon.md
+- nmap-port-scanning.md
+- web-enumeration.md
+- service-enumeration.md
+- password-attacks.md
+- web-exploitation.md
+- buffer-overflow-exploitation.md
+- pivoting.md
+- persistence.md
+- log-anti-forensics.md
+- capstone-full-chain-ctf.md
 
 # Information for Learners
 learners:
 
 # Information for Instructors
 instructors:
+- instructor-notes.md
+- lab2-notes.md
+- lab3-notes.md
+- lab4-notes.md
+- lab5-notes.md
+- lab6-notes.md
+- lab7-notes.md
+- lab8-notes.md
+- lab9-notes.md
+- lab10-notes.md
+- lab11-notes.md
+- lab12-notes.md
 
 # Learner Profiles
 profiles:

@@ -9,11 +9,11 @@ Docker-based lab environments. Each episode pairs a self-contained lab (an
 attacker container plus purpose-built vulnerable targets on a private Docker
 network) with a guided worksheet, so nothing here ever touches a real system.
 
-This is a pilot episode ported from the companion
-[Hacking-Labs-Training][source-repo] repository — a 12-lab, 5-phase ethical
+This is the full 12-lab curriculum, ported from the companion
+[Hacking-Labs-Training][source-repo] repository — a 5-phase ethical
 hacking curriculum (Reconnaissance → Scanning & Enumeration → Gaining Access
-→ Maintaining Access → Covering Tracks) — into [The Carpentries
-Workbench][workbench] lesson format.
+→ Maintaining Access → Covering Tracks), capped with a full-chain capstone
+CTF — into [The Carpentries Workbench][workbench] lesson format.
 
 [workbench]: https://carpentries.github.io/sandpaper-docs
 [source-repo]: https://github.com/moktan456/Hacking-Labs-Training

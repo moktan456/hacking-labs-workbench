@@ -4,11 +4,10 @@
 
 A [Carpentries Workbench][workbench] lesson teaching practical, hands-on
 ethical hacking skills through isolated Docker lab environments. This repo
-is a **pilot port** of Lab 1 (Packet Capture & Traffic Analysis) from the
-companion [Hacking-Labs-Training](https://github.com/moktan456/Hacking-Labs-Training)
-repository, which holds the full 12-lab, 5-phase curriculum plus weekly
-presentation slides. If the Workbench format proves out here, the remaining
-labs will be ported the same way.
+is the full 12-lab, 5-phase curriculum ported from the companion
+[Hacking-Labs-Training](https://github.com/moktan456/Hacking-Labs-Training)
+repository (which also holds the original weekly presentation slides),
+capped with a full-chain capstone CTF.
 
 Built from [carpentries/workbench-template-md](https://github.com/carpentries/workbench-template-md).
 

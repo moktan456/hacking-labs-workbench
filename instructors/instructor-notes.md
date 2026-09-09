@@ -4,20 +4,45 @@ title: Instructor Notes
 
 ## Overview
 
-This is a **pilot episode** porting Lab 1 (Packet Capture & Traffic
-Analysis, Phase 1 — Reconnaissance) from the companion
+This lesson ports the full 12-lab, 5-phase curriculum from the companion
 [Hacking-Labs-Training](https://github.com/moktan456/Hacking-Labs-Training)
-repository — a 12-lab, 5-phase ethical hacking curriculum — into The
-Carpentries Workbench format. If this pilot works well for your cohort, the
-remaining 11 labs (scanning/enumeration, gaining access, maintaining access,
-covering tracks, and the capstone CTF) can be ported the same way.
+repository into The Carpentries Workbench format:
+
+| # | Episode | Phase |
+|---|---|---|
+| 1 | Packet Capture & Traffic Analysis | 1 — Reconnaissance |
+| 2 | OSINT & Active Host Discovery | 1 — Reconnaissance |
+| 3 | Nmap Port & Service Scanning | 2 — Scanning & Enumeration |
+| 4 | Web Enumeration | 2 — Scanning & Enumeration |
+| 5 | Directory Service & DB Enumeration | 2 — Scanning & Enumeration |
+| 6 | Password Attacks | 3 — Gaining Access |
+| 7 | Web Application Exploitation | 3 — Gaining Access |
+| 8 | Exploit Development (Buffer Overflow) | 3 — Gaining Access |
+| 9 | Lateral Movement & Pivoting | 4 — Maintaining Access |
+| 10 | Persistence & Backdoors | 4 — Maintaining Access |
+| 11 | Log Manipulation & Anti-Forensics | 5 — Covering Tracks |
+| 12 | Full-Chain Capstone CTF | Capstone |
+
+Each episode after the first has its own instructor notes page (`lab2-notes.md`
+through `lab12-notes.md`) with that lab's CTF walkthrough and sticking points.
+This page covers the lesson as a whole plus **Lab 1** specifically.
+
+Only one lab's Docker Compose stack should run at a time — each uses its own
+subnet, but running several simultaneously wastes resources and complicates
+debugging. Have learners `docker compose down` before moving to the next
+episode (see [Setup](../learners/setup.html)).
 
 ## Timing
 
-Full episode: ~75 minutes (20 min teaching + 55 min exercises), matching the
-original worksheet's four parts plus the knowledge check.
+Each lab runs roughly 60–100 minutes end to end (teaching + exercises); see
+each episode's front matter for its specific `teaching`/`exercises` split.
+The full 12-lab curriculum is designed as a multi-week course (it mirrors the
+companion repo's 8 weeks of presentation slides plus 4 additional labs) — it
+is not intended to be run in a single session.
 
-## CTF walkthrough (spoiler — instructors only)
+## Lab 1: Packet Capture & Traffic Analysis
+
+### CTF walkthrough (spoiler — instructors only)
 
 The episode's optional CTF challenge asks learners to find `user.txt` and
 `root.txt` on `lab1-telnet` (10.10.1.10) with no hints. Answers:
@@ -32,10 +57,7 @@ The episode's optional CTF challenge asks learners to find `user.txt` and
   logged into the box; no privilege escalation exploit is required for this
   particular lab (that skill is introduced in later phases).
 
-Full detail lives in `ctf-walkthrough.md` in the source repository,
-`labs/phase1-reconnaissance/lab1-packet-capture/`.
-
-## Common sticking points
+### Common sticking points
 
 - Learners sometimes try `tcpdump` on the **target** container instead of
   the attacker — reinforce the callout in the episode about why a Docker
